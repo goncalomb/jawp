@@ -11,19 +11,34 @@ if (isset($_POST['content'])) {
     file_put_contents(PAGE_FILE, $content_raw);
 } else if (is_file(PAGE_FILE)) {
     $content_raw = file_get_contents(PAGE_FILE);
-}
+} else (
+    $content_raw = <<<EOF
+---
+title: Just A Web Page
+a-target-blank: false
+---
+# Just A Web Page
+
+* Item 1
+* Item 2
+* Item 3
+EOF
+);
 
 $config = [];
 $content = '';
+$error = '';
 
 if (!empty($content_raw)) {
     $parser = new Mni\FrontYAML\Parser();
-    $document = $parser->parse($content_raw);
-    $config = $document->getYAML();
-    $content = $document->getContent();
+    try {
+        $document = $parser->parse($content_raw);
+        $config = $document->getYAML();
+        $content = $document->getContent();
+    } catch (Exception $e) {
+        $error = 'Malformed YAML Front Matter or Markdown';
+    }
 }
-
-$title = 'Just A Web Page';
 
 ?>
 <!DOCTYPE html>
@@ -31,7 +46,7 @@ $title = 'Just A Web Page';
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title><?php echo htmlspecialchars($title); ?></title>
+        <title><?php echo isset($config['title']) ? htmlspecialchars($config['title']) : '-'; ?></title>
         <style>
             body {
                 font-family: sans-serif;
@@ -46,6 +61,9 @@ $title = 'Just A Web Page';
                 height: 85vh;
                 resize: none;
             }
+            .error {
+                color: red;
+            }
         </style>
     </head>
     <body>
@@ -56,6 +74,7 @@ $title = 'Just A Web Page';
             </p>
         </header>
         <main>
+            <?php echo $error ? '<p class="error">' . $error . '</p>' . "\n" : "<!-- -->\n"; ?>
             <div id="content"><?php echo $content; ?></div>
             <form id="edit" method="post">
                 <textarea name="content"><?php echo $content_raw; ?></textarea>
@@ -70,6 +89,9 @@ $title = 'Just A Web Page';
                     document.querySelector("#content").style.display = editing ? "none" : null;
                     document.querySelector("#edit").style.display = editing ? "block" : null;
                 };
+                if (<?php echo $config['a-target-blank'] ? 'true' : 'false'; ?>) {
+                    document.querySelectorAll("#content a").forEach(el => el.setAttribute("target", "_blank"));
+                }
             })();
         </script>
     </body>
