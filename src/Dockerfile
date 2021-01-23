@@ -1,6 +1,6 @@
 FROM composer:1.10 AS builder
 
-COPY composer.json .
+COPY composer.* ./
 RUN composer install
 
 COPY . .
