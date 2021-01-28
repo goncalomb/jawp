@@ -1,0 +1,35 @@
+.markdown {
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+.markdown blockquote {
+    padding-left: .5em;
+    border-left: 3px solid #ddd;
+}
+
+.markdown table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.markdown table thead th {
+    background-color: #eee;
+}
+
+.markdown table th, .markdown table td {
+    padding: .5em .75em;
+    border: 1px solid #bbb;
+}
+
+.markdown code {
+    padding: 0 .2em;
+    border-radius: .2em;
+    border: 1px solid #bbb;
+    background-color: #eee;
+}
+
+.markdown pre code {
+    padding: .2em .5em;
+    display: block;
+}

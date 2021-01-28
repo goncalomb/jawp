@@ -2,6 +2,7 @@
 
 require '../vendor/autoload.php';
 
+define('DEFAULT_FILE', implode(DIRECTORY_SEPARATOR, [__DIR__, 'default.md']));
 define('PAGE_FILE', implode(DIRECTORY_SEPARATOR, [__DIR__, '..', 'data', 'page.md']));
 
 $content_raw = '';
@@ -11,19 +12,9 @@ if (isset($_POST['content'])) {
     file_put_contents(PAGE_FILE, $content_raw);
 } else if (is_file(PAGE_FILE)) {
     $content_raw = file_get_contents(PAGE_FILE);
-} else (
-    $content_raw = <<<EOF
----
-title: Just A Web Page
-a-target-blank: false
----
-# Just A Web Page
-
-* Item 1
-* Item 2
-* Item 3
-EOF
-);
+} else {
+    $content_raw = file_get_contents(DEFAULT_FILE);
+}
 
 $config = [];
 $content = '';
@@ -46,6 +37,7 @@ if (!empty($content_raw)) {
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="markdown.css" rel="stylesheet">
         <title><?php echo isset($config['title']) ? htmlspecialchars($config['title']) : '-'; ?></title>
         <style>
             body {
@@ -75,7 +67,7 @@ if (!empty($content_raw)) {
         </header>
         <main>
             <?php echo $error ? '<p class="error">' . $error . '</p>' . "\n" : "<!-- -->\n"; ?>
-            <div id="content"><?php echo $content; ?></div>
+            <div id="content" class="markdown"><?php echo $content; ?></div>
             <form id="edit" method="post">
                 <textarea name="content"><?php echo $content_raw; ?></textarea>
                 <button type="submit">SAVE</button>
